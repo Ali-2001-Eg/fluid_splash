@@ -1,11 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+
 enum Side { left, top, right, bottom }
 
 
 class FluidEdge extends ChangeNotifier {
-  List<_FluidPoint> points = [];
+  List<FluidPoint> points = [];
   Side side;
   double edgeTension = 0.01;
   double farEdgeTension = 0.0;
@@ -19,7 +20,7 @@ class FluidEdge extends ChangeNotifier {
 
   FluidEdge({count = 10, this.side = Side.left}) {
     for (int i = 0; i < count; i++) {
-      points.add(_FluidPoint(0.0, i / (count - 1)));
+      points.add(FluidPoint(0.0, i / (count - 1)));
     }
   }
 
@@ -53,10 +54,10 @@ class FluidEdge extends ChangeNotifier {
 
     Path path = Path();
     int l = points.length;
-    Offset pt = _FluidPoint(-margin, 1.0).toOffset(mtx), pt1;
+    Offset pt = FluidPoint(-margin, 1.0).toOffset(mtx), pt1;
     path.moveTo(pt.dx, pt.dy);
 
-    pt = _FluidPoint(-margin, 0.0).toOffset(mtx);
+    pt = FluidPoint(-margin, 0.0).toOffset(mtx);
     path.lineTo(pt.dx, pt.dy);
 
     pt = points[0].toOffset(mtx);
@@ -89,7 +90,7 @@ class FluidEdge extends ChangeNotifier {
     double dampingT = pow(damping, t) as double;
 
     for (int i = 0; i < l; i++) {
-      _FluidPoint pt = points[i];
+      FluidPoint pt = points[i];
       pt.velX -= pt.x * edgeTension * t;
       pt.velX += (1.0 - pt.x) * farEdgeTension * t;
       if (touchOffset != null) {
@@ -106,7 +107,7 @@ class FluidEdge extends ChangeNotifier {
     }
 
     for (int i = 0; i < l; i++) {
-      _FluidPoint pt = points[i];
+      FluidPoint pt = points[i];
       pt.x += pt.velX * t;
     }
     notifyListeners();
@@ -137,18 +138,18 @@ class FluidEdge extends ChangeNotifier {
     return mtx;
   }
 
-  void _addPointTension(_FluidPoint pt0, double x, double t) {
+  void _addPointTension(FluidPoint pt0, double x, double t) {
     pt0.velX += (x - pt0.x) * pointTension * t;
   }
 }
 
-class _FluidPoint {
+class FluidPoint {
   double x;
   double y;
   double velX = 0.0;
   double velY = 0.0;
 
-  _FluidPoint([this.x = 0.0, this.y = 0.0]);
+  FluidPoint([this.x = 0.0, this.y = 0.0]);
 
   Offset toOffset([Matrix4? transform]) {
     Offset o = Offset(x, y);
